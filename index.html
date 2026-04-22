@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>计数器</title>
+
+<style>
+  body { text-align:center; font-family:Arial; }
+  .item { display:inline-block; margin:10px; }
+  img { width:120px; cursor:pointer; }
+  .count { font-size:18px; }
+  #stats { margin-top:20px; font-size:20px; }
+  .reset-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  color: rgb(255, 255, 255);
+
+  background: linear-gradient(135deg, #00d5ff);
+  border: none;
+  border-radius: 12px;
+
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+
+  transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+}
+
+.reset-btn:active {
+  transform: scale(0.95);
+}
+</style>
+</head>
+
+<body>
+
+<button class="reset-btn" onclick="resetAll()">Reset</button>
+
+<h2>点击图片计数</h2>
+
+<div id="container"></div>
+<div id="stats"></div>
+
+
+<script>
+    
+function resetAll() {
+  if (confirm("确定要重置所有数据吗？")) {
+    items.forEach(item => item.count = 0);
+    updateStats();
+    render();
+  }
+}   
+// 🔥 S1赛季异色精灵
+let items = [
+  { name: "柴渣虫",
+   type: ["火系","草系" ],
+   count: 0,
+   img: "https://patchwiki.biligame.com/images/rocom/a/a3/t3ec092gh9ocd64wuqjewlf56yjvxhg.png" },
+  { name: "双灯鱼", 
+  type: ["水系","电系"],
+  count: 0, 
+  img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7hZwFhRQPu2x3i5qAIkYKDRjowmEJzXFkmw&s" },
+  { name: "月牙雪熊", 
+  type: ["冰系","幻系"], 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/5/5d/0cskl2u4wneivk2icntkrcaiwuwv4yq.png" },
+  { name: "粉粉星", 
+  type: ["电系","幻系"], 
+  count: 0, 
+  img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_y8e3QJQLpujFu1JWReFNr-1U3lUilSBJaQ&s" },
+  { name: "空空颅", 
+  type: "幽系", 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/4/41/kypxrmm8mobwqs3oseltznss9iqhrh2.png" },
+  { name: "嗜光嗡嗡", 
+  type: ["光系","恶系"], 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/6/6c/83k9t4acg7s1haeupl1wxml4pipklpa.png" },
+  { name: "贝瑟", 
+  type: ["火系","机械系"], 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/d/d1/7c8xj95wzoxszdwytae10y9cfjdevim.png" },
+  { name: "粉星仔", 
+  type: "幻系", 
+  count: 0, 
+  img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8DnX2pDrPllSUajqPLlR4CZHT0S_1ZSma-Q&s" },
+  { name: "格兰种子", 
+  type: "草系", 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/d/d3/b3jzacefc99rb5kz2yh5ta03dq5rd2e.png" },
+  { name: "奇丽草", 
+  type: "草系", 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/1/1f/kv2w95rommythz2es62viqib0edez2m.png" },
+  { name: "治愈兔", 
+  type: ["火系","萌系"], 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/a/aa/rngx23e2gk0fv954dvqfy4imdotkztj.png" },
+  { name: "呼呼猪", 
+  type: ["冰系","地系"], 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/e/e8/8vuqx5j838k85ddgjcl56zhh42wtfqa.png" },
+  { name: "大耳帽兜", 
+  type: ["冰系","萌系"], 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/9/90/5nj4in6eecm1rhiqat7avfogm5l3cx0.png" },
+  { name: "拉特", 
+  type: "电系", 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/a/a1/4pqv1u751dss8ff0u87y747ot29b4m9.png" },
+  { name: "恶魔狼", 
+  type: "恶系", 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/6/6a/8rz167blfbrzzs44u5mq8a0k7im6ap8.png" },
+  { name: "机械方方", 
+  type: "机械系", 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/0/0b/pgpg5oimlp3vj22sforlyu0o5mlenw8.png" },
+  { name: "绒绒", 
+  type: "绒绒", 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/0/08/654ffcp524wy323uwi7k1z7rk4rejuc.png" },
+  { name: "犀角鸟", 
+  type: "犀角鸟", 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/6/6a/81qhw7nwi52la93w31dkqwhrzwgqiqw.png" },
+  { name: "火红尾", 
+  type: "火红尾", 
+  count: 0, 
+  img: "https://patchwiki.biligame.com/images/rocom/0/00/gknyb1qbbno2vnvcvyb4p9a0o9y1owp.png" }
+];
+
+function loadData() {
+  let saved = localStorage.getItem("items");
+
+  if (saved) {
+    let parsed = JSON.parse(saved);
+
+    // ⭐ 防止数据结构坏掉
+    if (Array.isArray(parsed)) {
+      items = parsed;
+    }
+  }
+}
+
+function saveData() {
+  localStorage.setItem("items", JSON.stringify(items));
+}
+
+function addOne(i) {
+  items[i].count++;
+  saveData();   // ⭐必须有
+  render();
+}
+
+function resetAll() {
+  items.forEach(item => item.count = 0);
+
+  saveData();   // ⭐必须有
+  render();
+}
+
+// 渲染
+function render() {
+  const container = document.getElementById("container");
+  container.innerHTML = "";
+
+  items.forEach((item, i) => {
+    container.innerHTML += `
+      <div class="item">
+        <img src="${item.img}" onclick="addOne(${i})">
+        <div>${item.name}</div>
+        <div class="count">数量: ${item.count}</div>
+      </div>
+    `;
+  });
+
+  updateStats();
+}
+
+// 点击 +1
+function addOne(i) {
+  items[i].count++;
+  saveData();   // ⭐必须有
+  render();
+}
+
+// 属性统计
+function updateStats() {
+  let stats = {};
+
+  items.forEach(item => {
+
+    let types = Array.isArray(item.type)
+      ? item.type
+      : item.type.split(",");
+
+    types.forEach(t => {
+      t = t.trim();
+
+      if (!stats[t]) stats[t] = 0;
+      stats[t] += item.count;
+    });
+
+  });
+
+
+  let text = "<h3>统计</h3>";
+  let hasData = false;
+
+  for (let t in stats) {
+    text += `${t}: ${stats[t]}   `;
+    hasData = true;
+  }
+
+  if (!hasData) {
+    text += "暂无数据";
+  }
+
+  document.getElementById("stats").innerHTML = text;
+}
+
+loadData();
+render();
+
+
+
+</script>
+
+</body>
+</html>
