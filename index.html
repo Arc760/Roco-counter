@@ -42,12 +42,17 @@
 <button class="reset-btn" onclick="resetAll()">Reset</button>
 
 <h2>点击图片计数</h2>
+<br>
+<h3>左键+1，右键-1，长按选择数值</h3>
 
 <div id="container"></div>
 <div id="stats"></div>
 
 
 <script>
+
+let pressTimer = null;
+let currentIndex = null;
     
 function resetAll() {
   if (confirm("确定要重置所有数据吗？")) {
@@ -131,7 +136,7 @@ let items = [
   count: 0, 
   img: "https://patchwiki.biligame.com/images/rocom/6/6a/81qhw7nwi52la93w31dkqwhrzwgqiqw.png" },
   { name: "火红尾", 
-  type: "火红尾", 
+  type: "火系", 
   count: 0, 
   img: "https://patchwiki.biligame.com/images/rocom/0/00/gknyb1qbbno2vnvcvyb4p9a0o9y1owp.png" }
 ];
@@ -155,14 +160,51 @@ function saveData() {
 
 function addOne(i) {
   items[i].count++;
-  saveData();   // ⭐必须有
+  saveData();  
+  render();
+}
+
+function minusOne(i) {
+  if (items[i].count > 0) {
+    items[i].count--;
+  }
+  saveData();
+  render();
+}
+
+function handleMouseDown(i) {
+  currentIndex = i;
+
+  pressTimer = setTimeout(() => {
+    showPopup(i);
+  }, 600);
+}
+
+function handleMouseUp() {
+  clearTimeout(pressTimer);
+}
+
+function showPopup(i) {
+  let num = prompt("输入数字（正数=加，负数=减）");
+
+  if (num === null) return;
+
+  num = parseInt(num);
+
+  if (isNaN(num)) return;
+
+  items[i].count += num;
+
+  if (items[i].count < 0) items[i].count = 0;
+
+  saveData();
   render();
 }
 
 function resetAll() {
   items.forEach(item => item.count = 0);
 
-  saveData();   // ⭐必须有
+  saveData();   
   render();
 }
 
@@ -174,7 +216,12 @@ function render() {
   items.forEach((item, i) => {
     container.innerHTML += `
       <div class="item">
-        <img src="${item.img}" onclick="addOne(${i})">
+        <img src="${item.img}"
+            onclick="addOne(${i})"
+            oncontextmenu="event.preventDefault(); minusOne(${i})"
+            onmousedown="handleMouseDown(${i})"
+            onmouseup="handleMouseUp()"
+            onmouseleave="handleMouseUp()">
         <div>${item.name}</div>
         <div class="count">数量: ${item.count}</div>
       </div>
@@ -188,6 +235,14 @@ function render() {
 function addOne(i) {
   items[i].count++;
   saveData();   // ⭐必须有
+  render();
+}
+
+function minusOne(i) {
+  if (items[i].count > 0) {
+    items[i].count--;
+  }
+  saveData();
   render();
 }
 
