@@ -152,24 +152,24 @@ let currentIndex = null;
 let historyStack = [];
 
 function getBasePath() {
-  const path = window.location.pathname;
+  const hostname = window.location.hostname;
 
-  const repo = path.split("/")[1];
-
-  if (window.location.hostname.includes("github.io")) {
-    return "/" + repo + "/";
+  if (hostname.includes("github.io")) {
+    const pathParts = window.location.pathname.split("/");
+    const repoName = pathParts[1];
+    return "/" + repoName + "/";
   }
 
   return "./";
 }
-
 // 最简单最稳
-const BASE = "./";
 
 function imgPath(file) {
-  return "/roco-counter/roco-image/" + file;
+  const isGitHub = location.hostname.includes("github.io");
+  return isGitHub
+    ? "/roco-counter/roco-image/" + file
+    : "./roco-image/" + file;
 }
-    
 // 🔥 S1赛季异色精灵
 window.items = [
   { name: "柴渣虫",
