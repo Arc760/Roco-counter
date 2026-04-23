@@ -207,7 +207,7 @@ function render() {
            onmouseleave="handleMouseUp()">
 
         <img src="${item.img}"
-             onerror="this.src='${BASE}roco-image/fallback.png'">
+         onerror="this.onerror=null;this.src='roco-image/fallback.png'">
 
         <div>${item.name}</div>
         <div class="count">数量: ${item.count}</div>
