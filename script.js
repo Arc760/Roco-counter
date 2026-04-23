@@ -2,6 +2,8 @@ let pressTimer = null;
 let currentIndex = null;
 let historyStack = [];
 
+const STORAGE_KEY = "items_v2";
+
 function getBasePath() {
   const hostname = window.location.hostname;
 
@@ -52,21 +54,29 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 function loadData() {
-  let saved = localStorage.getItem("items");
+  const saved = localStorage.getItem(STORAGE_KEY);
 
-  if (saved) {
-    let parsed = JSON.parse(saved);
+  if (!saved) {
+    items = defaultItems;
+    saveData();
+  } else {
+    try {
+      items = JSON.parse(saved);
 
-    // ⭐ 防止数据结构坏掉
-    if (Array.isArray(parsed)) {
-      items = parsed;
+      if (!Array.isArray(items)) {
+        items = defaultItems;
+      }
+    } catch {
+      items = defaultItems;
     }
   }
 }
 
+
 function saveData() {
-  localStorage.setItem("items", JSON.stringify(items));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
 }
+
 
 window.addOne = function(i) {
   saveHistory(); //有撤回效果
@@ -89,10 +99,12 @@ window.minusOne = function(i) {
 
 function saveHistory() {
   historyStack.push(JSON.stringify(items));
+  if (historyStack.length > 50) historyStack.shift();
+}
 
-  if (historyStack.length > 50) {
-    historyStack.shift();
-  }
+function updateItem(i) {
+  const el = document.querySelector(`[data-index="${i}"] .count`);
+  if (el) el.textContent = `数量: ${items[i].count}`;
 }
 
 window.handleMouseDown = function(i) {
