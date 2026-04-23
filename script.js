@@ -3,8 +3,6 @@ let currentIndex = null;
 
 let historyStack = [];
 
-localStorage.clear();
-
 function getBasePath() {
   const hostname = window.location.hostname;
 
