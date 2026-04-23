@@ -18,7 +18,7 @@ function getBasePath() {
 const BASE = "./";
 
 function imgPath(file) {
-  return "/roco-counter/roco-image/" + file;
+  return "roco-image/" + file;
 }
     
 // 🔥 S1赛季异色精灵
