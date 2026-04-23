@@ -1,6 +1,5 @@
 let pressTimer = null;
 let currentIndex = null;
-
 let historyStack = [];
 
 function getBasePath() {
