@@ -1,8 +1,7 @@
 let pressTimer = null;
 let currentIndex = null;
-let historyStack = [];
 
-const STORAGE_KEY = "items_v2";
+let historyStack = [];
 
 function getBasePath() {
   const hostname = window.location.hostname;
@@ -24,28 +23,94 @@ function imgPath(file) {
     
 // 🔥 S1赛季异色精灵
 window.items = [
-  { name: "柴渣虫",type: ["火系"],count: 0,img: imgPath("chai.png")},
-  { name: "双灯鱼",type: ["水系"],count: 0,img: imgPath("fish.png")},
-  { name: "月牙雪熊",type: ["冰系"],count: 0,img: imgPath("bear.png")},
-  { name: "粉粉星",type: ["电系"],count: 0,img: imgPath("star.png")},
-  { name: "空空颅",type: "幽系",count: 0,img: imgPath("skull.png")},
-  { name: "嗜光嗡嗡",type: ["恶系"],count: 0,img: imgPath("mosquito.png")},
-  { name: "贝瑟",type: ["机械系"],count: 0,img: imgPath("pot.png")},
-  { name: "粉星仔",type: "幻系",count: 0,img: imgPath("zai.png")},
-  { name: "格兰种子",type: "草系",count: 0,img: imgPath("seed.png")},
-  { name: "奇丽草",type: "草系",count: 0,img: imgPath("grass.png")},
-  { name: "治愈兔",type: ["火系"],count: 0,img: imgPath("rabbit.png")},
-  { name: "呼呼猪",type: ["冰系"],count: 0,img: imgPath("pig.png")},
-  { name: "大耳帽兜",type: ["冰系"],count: 0,img: imgPath("dou.png")},
-  { name: "拉特", type: "电系",count: 0,img: imgPath("rai.png")},
-  { name: "恶魔狼",type: "恶系",count: 0,img: imgPath("wolf.png")},
-  { name: "机械方方",type: "机械系",count: 0,img: imgPath("cube.png")},
-  { name: "绒绒",type: "绒绒",count: 0,img: imgPath("rong.png")},
-  { name: "犀角鸟",type: "犀角鸟",count: 0,img: imgPath("mop.png")},
-  { name: "火红尾",type: "火系",count: 0,img: imgPath("horse.png")},
-  { name: "果冻",type: "水系",count: 0,img: imgPath("jelly.png")},
-  { name: "星尘虫",type: "虫系",count: 0,img: imgPath("ladybug.png")},
-  { name: "影狸",type: "幽系",count: 0,img: imgPath("fox.png")},
+  { name: "柴渣虫",
+   type: ["火系"],
+   count: 0,
+   img: imgPath("chai.png")},
+  { name: "双灯鱼", 
+  type: ["水系"],
+  count: 0, 
+  img: imgPath("fish.png")},
+  { name: "月牙雪熊", 
+  type: ["冰系"], 
+  count: 0, 
+  img: imgPath("bear.png")},
+  { name: "粉粉星", 
+  type: ["电系"], 
+  count: 0, 
+  img: imgPath("star.png")},
+  { name: "空空颅", 
+  type: "幽系", 
+  count: 0, 
+  img: imgPath("skull.png")},
+  { name: "嗜光嗡嗡", 
+  type: ["恶系"], 
+  count: 0, 
+  img: imgPath("mosquito.png")},
+  { name: "贝瑟", 
+  type: ["机械系"], 
+  count: 0, 
+  img: imgPath("pot.png")},
+  { name: "粉星仔", 
+  type: "幻系", 
+  count: 0, 
+  img: imgPath("zai.png")},
+  { name: "格兰种子", 
+  type: "草系", 
+  count: 0, 
+  img: imgPath("seed.png")},
+  { name: "奇丽草", 
+  type: "草系", 
+  count: 0, 
+  img: imgPath("grass.png")},
+  { name: "治愈兔", 
+  type: ["火系"], 
+  count: 0, 
+  img: imgPath("rabbit.png")},
+  { name: "呼呼猪", 
+  type: ["冰系"], 
+  count: 0, 
+  img: imgPath("pig.png")},
+  { name: "大耳帽兜", 
+  type: ["冰系"], 
+  count: 0, 
+  img: imgPath("dou.png")},
+  { name: "拉特", 
+  type: "电系", 
+  count: 0, 
+  img: imgPath("rai.png")},
+  { name: "恶魔狼", 
+  type: "恶系", 
+  count: 0, 
+  img: imgPath("wolf.png")},
+  { name: "机械方方", 
+  type: "机械系", 
+  count: 0, 
+  img: imgPath("cube.png")},
+  { name: "绒绒", 
+  type: "绒绒", 
+  count: 0, 
+  img: imgPath("rong.png")},
+  { name: "犀角鸟", 
+  type: "犀角鸟", 
+  count: 0, 
+  img: imgPath("mop.png")},
+  { name: "火红尾", 
+  type: "火系", 
+  count: 0, 
+  img: imgPath("horse.png")},
+  { name: "果冻", 
+  type: "水系", 
+  count: 0, 
+  img: imgPath("jelly.png")},
+  { name: "星尘虫", 
+  type: "虫系", 
+  count: 0, 
+  img: imgPath("ladybug.png")},
+  { name: "影狸", 
+  type: "幽系", 
+  count: 0, 
+  img: imgPath("fox.png")},
 ];
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -54,29 +119,21 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 function loadData() {
-  const saved = localStorage.getItem(STORAGE_KEY);
+  let saved = localStorage.getItem("items");
 
-  if (!saved) {
-    items = defaultItems;
-    saveData();
-  } else {
-    try {
-      items = JSON.parse(saved);
+  if (saved) {
+    let parsed = JSON.parse(saved);
 
-      if (!Array.isArray(items)) {
-        items = defaultItems;
-      }
-    } catch {
-      items = defaultItems;
+    // ⭐ 防止数据结构坏掉
+    if (Array.isArray(parsed)) {
+      items = parsed;
     }
   }
 }
 
-
 function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  localStorage.setItem("items", JSON.stringify(items));
 }
-
 
 window.addOne = function(i) {
   saveHistory(); //有撤回效果
@@ -99,12 +156,10 @@ window.minusOne = function(i) {
 
 function saveHistory() {
   historyStack.push(JSON.stringify(items));
-  if (historyStack.length > 50) historyStack.shift();
-}
 
-function updateItem(i) {
-  const el = document.querySelector(`[data-index="${i}"] .count`);
-  if (el) el.textContent = `数量: ${items[i].count}`;
+  if (historyStack.length > 50) {
+    historyStack.shift();
+  }
 }
 
 window.handleMouseDown = function(i) {
