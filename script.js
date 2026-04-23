@@ -14,8 +14,6 @@ function getBasePath() {
 
   return "./";
 }
-// 最简单最稳
-const BASE = "./";
 
 function imgPath(file) {
   return "roco-image/" + file;
