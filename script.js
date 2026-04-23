@@ -193,6 +193,8 @@ function showPopup(i) {
   render();
 }
 
+let isRendering = false;
+
 window.render = function () {
   const container = document.getElementById("container");
 
