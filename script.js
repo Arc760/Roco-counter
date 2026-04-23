@@ -1,4 +1,7 @@
-// =====================
+let pressTimer = null;
+let currentIndex = null;
+
+let historyStack = [];
 // 1. 数据（核心）
 window.items = [
   { name: "柴渣虫", type: ["火系"], count: 0, img: "./roco-image/chai.png" },
