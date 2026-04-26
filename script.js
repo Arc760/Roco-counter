@@ -290,7 +290,7 @@ function updateStats() {
 
   items.forEach(item => {
     (Array.isArray(item.type) ? item.type : [item.type]).forEach(t => {
-      if (t === "虫系") return; // 排除虫系
+      if (t === "虫系") return;
       stats[t] = (stats[t] || 0) + item.count;
     });
   });
@@ -298,25 +298,12 @@ function updateStats() {
   const box = document.getElementById("stats");
   box.innerHTML = "";
 
-  let hasData = false;
-
   Object.entries(stats).forEach(([type, value]) => {
-    hasData = true;
+    const span = document.createElement("span");
 
-    const div = document.createElement("div");
-    div.className = "stat-item";
+    span.innerText = `${type}:${value}  `;
+    span.style.color = value > 0 ? "#000" : "#aaa";
 
-    // ⭐关键：有数值才变黑
-    if (value > 0) {
-      div.classList.add("active");
-    }
-
-    div.innerText = `${type}: ${value}`;
-
-    box.appendChild(div);
+    box.appendChild(span);
   });
-
-  if (!hasData) {
-    box.innerHTML = `<div class="stat-item">暂无数据</div>`;
-  }
 }
