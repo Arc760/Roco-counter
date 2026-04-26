@@ -40,6 +40,9 @@ window.addEventListener("DOMContentLoaded", () => {
   loadData();
   render();
 
+  container.style.display = "grid";
+  container.style.gridTemplateColumns = "repeat(6, 1fr)";
+
   resetBtn = document.querySelector(".reset-btn");
   undoBtn = document.querySelector(".undo-btn");
 
