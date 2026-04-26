@@ -1,222 +1,120 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta charset="UTF-8">
 <title>计数器</title>
 
 <style>
-
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
-
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #f5f5f5;
-  user-select: none;
-  -webkit-user-select: none;
-  overflow-x: hidden;
-}
-
-/* 顶部栏 */
-.top-bar {
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: white;
-  padding: 0 10px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-/* 提示文字 */
-.left-text {
-  font-size: 11px;
-  color: #999;
-}
-
-.center-group {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 6px;
-}
-
-
-/* 按钮样式统一 */
-.reset-btn, .undo-btn {
-  font-size: 12px;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 6px;
-  background: #00bfff;
-  color: white;
+  body { text-align:center; font-family:Arial; }
+  .item { display:inline-block; margin:10px; }
+  img { width:120px; cursor:pointer; }
+  .count { font-size:18px; }
+  #stats { margin-top:20px; font-size:20px; }
+  
+  .top-bar {
+    position: relative;
+    height: 50px;
 }
 
 .reset-btn {
-  touch-action: none;
-  user-select: none;
-}
-.undo-btn {
+  padding: 12px 24px;
+  font-size: 16px;
   font-weight: bold;
-}
+  color: rgb(255, 255, 255);
 
-/* 按钮 */
-button {
-  font-size: 12px;
-  padding: 5px 10px;
+  background: linear-gradient(135deg, #00d5ff);
   border: none;
-  border-radius: 6px;
-  background: #00bfff;
-  color: white;
+  border-radius: 12px;
 
-  min-width: 60px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+
+  transition: all 0.2s ease;
+
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
-button:active {
-  transform: scale(0.95);
+.reset-btn:hover {
+  transform: translateX(-50%) scale(1.05); /* ⭐必须带回居中 */
+  box-shadow: 0 6px 14px rgba(0,0,0,0.4);
 }
 
-/* ===== 核心：响应式网格 ===== */
-#container {
-  display: grid;
-  gap: 4px;
-  padding: 6px;
-
-  /* 默认手机竖屏 */
-  grid-template-columns: repeat(4, 1fr);
+.reset-btn:active {
+  transform: translateX(-50%) scale(0.95); /* ⭐同理 */
 }
 
-@media (orientation: landscape) {
-  #container {
-    grid-template-columns: repeat(6, 1fr);
-  }
-}
-
-.grid-wrapper {
-  min-width: 100%;
-}
-
-/* 卡片 */
-.item {
-  background: #fff;
-  border-radius: 8px;
-  aspect-ratio: 1/1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  font-size: 10px;
-}
-
-
-.item img {
-  width: 80%;
-  height: auto;
-}
-
-/* 名字 */
-.item div {
-  font-size: 11px;
-}
-
-.item.empty {
-  background: transparent;
-  box-shadow: none;
-}
-
-#grid16, #grid6 {
-  display: grid;
-  gap: 4px;
-}
-
-/* 上面 4×4 */
-#grid16 {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-/* 下面 3×2 */
-#grid6 {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-/* 数字 */
-.count {
-  font-size: 12px;
+.undo-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
   font-weight: bold;
-  color: #aaa;
+  cursor: pointer;
+
+  color: #000dff;
+
+  padding: 5px 10px;
+  border-radius: 8px;
 }
 
-.count.active {
-  color: #00bfff;
+.undo-btn:hover {
+  transform: scale(1.2);
+  color: #000;
 }
 
-/* 统计栏 */
-#stats {
-  margin: 10px;
-  padding: 10px;
-  background: white;
-  border-radius: 10px;
-  font-size: 12px;
-  text-align: center;
+/* 左文本 */
+.left-text {
+  position: absolute;
+  right: calc(50% + 80px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight:bold;
+}
 
+.right-group {
+  position: absolute;
+  left: calc(50% + 80px); /* 紧贴Reset右边 */
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  align-items: center;
   gap: 6px;
 }
 
-.stat-item {
-  color: #aaa;
-  transition: 0.2s;
+.desc {
+  font-size: 14px;
+  color: #666;
 }
 
-.stat-item.active {
-  color: #000;
-  font-weight: normal;
-}
-
-/* 菜单 */
 .menu {
   position: absolute;
   display: none;
-  z-index: 9999;
-  background: white;
+  background: #fff;
   border-radius: 10px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
   padding: 8px;
-  width: 240px;
-  max-height: 60vh;
-  overflow: auto;
+  z-index: 9999;
+  width: 320px;
 }
 
+/* 双列容器 */
 .menu-grid {
   display: flex;
 }
 
-.menu-left,
-.menu-right {
-  width: 50%;
-  max-height: 300px;
-  overflow-y: auto;
+/* 左列：属性 */
+.menu-left {
+  width: 40%;
+  border-right: 1px solid #eee;
 }
 
-.menu-left {
-  border-right: 1px solid #eee;
+/* 右列：精灵 */
+.menu-right {
+  width: 60%;
+  padding-left: 10px;
 }
 
 .menu-item {
   padding: 6px;
-  font-size: 12px;
-  text-align: center;
   cursor: pointer;
   border-radius: 6px;
 }
@@ -230,36 +128,22 @@ button:active {
 
 <body>
 
-<!-- 顶部 -->
 <div class="top-bar">
 
-  <div class="center-group">
-    <button class="reset-btn">重置</button>
-    <button class="undo-btn">⮪</button>
-  </div>
+  <div class="left-text">点击图片计数</div>
 
-  <div class="left-text">
-    点击+1 | 右滑-1 |长按输入
+  <button class="reset-btn" onclick="resetAll()">Reset</button>
+  <div class="right-group">
+    <button class="undo-btn" onclick="undo()">⮪</button>
+    <span class="desc">左键+1|右键-1|长按选择数值|右键重置菜单</span>
   </div>
 
 </div>
 
-<!-- 网格 -->
-<div class="grid-wrapper">
-  <div id="container"></div>
-</div>
+<div id="container"></div>
+<div id="stats"></div>
 
-<!-- 统计 -->
-<div id="stats" class="stats"></div>
-
-<div id="resetMenu" class="menu">
-  <div class="menu-grid">
-    <div id="typeList" class="menu-left"></div>
-    <div id="nameList" class="menu-right"></div>
-  </div>
-</div>
-
-<script src="mobile-script.js" defer></script>
-
+<div id="typeMenu" class="menu"></div>
+<script src="./script.js?v=1"></script>
 </body>
 </html>
