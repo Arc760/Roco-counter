@@ -290,13 +290,33 @@ function updateStats() {
 
   items.forEach(item => {
     (Array.isArray(item.type) ? item.type : [item.type]).forEach(t => {
+      if (t === "虫系") return; // 排除虫系
       stats[t] = (stats[t] || 0) + item.count;
     });
   });
 
-  // ⭐关键：删除虫系（不显示，但不影响计数）
-  delete stats["虫系"];
+  const box = document.getElementById("stats");
+  box.innerHTML = "";
 
-  document.getElementById("stats").innerText =
-    Object.entries(stats).map(([k, v]) => `${k}:${v}`).join(" ") || "暂无数据";
+  let hasData = false;
+
+  Object.entries(stats).forEach(([type, value]) => {
+    hasData = true;
+
+    const div = document.createElement("div");
+    div.className = "stat-item";
+
+    // ⭐关键：有数值才变黑
+    if (value > 0) {
+      div.classList.add("active");
+    }
+
+    div.innerText = `${type}: ${value}`;
+
+    box.appendChild(div);
+  });
+
+  if (!hasData) {
+    box.innerHTML = `<div class="stat-item">暂无数据</div>`;
+  }
 }
