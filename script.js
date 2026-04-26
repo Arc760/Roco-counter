@@ -301,12 +301,17 @@ function updateStats() {
   const box = document.getElementById("stats");
   box.innerHTML = "";
 
-  Object.entries(stats).forEach(([type, value]) => {
-    const span = document.createElement("span");
+  Object.entries(stats).forEach(([k, v]) => {
+    const div = document.createElement("div");
+    div.className = "stat-item";
 
-    span.innerText = `${type}:${value}  `;
-    span.style.color = value > 0 ? "#000" : "#aaa";
+    div.textContent = `${k}: ${v}`;
 
-    box.appendChild(span);
+    // ⭐只要不是0就变黑
+    if (v > 0) {
+      div.classList.add("active");
+    }
+
+    box.appendChild(div);
   });
 }
