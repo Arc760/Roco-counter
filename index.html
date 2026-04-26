@@ -5,112 +5,148 @@
 <title>计数器</title>
 
 <style>
-  body { text-align:center; font-family:Arial; }
-  .item { display:inline-block; margin:10px; }
-  img { width:120px; cursor:pointer; }
-  .count { font-size:18px; }
-  #stats { margin-top:20px; font-size:20px; }
-  
-  .top-bar {
-    position: relative;
-    height: 50px;
+body {
+  margin: 0;
+  font-family: Arial;
+  text-align: center;
 }
 
-.reset-btn {
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: bold;
-  color: rgb(255, 255, 255);
+/* ===== 顶部 ===== */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  height: 60px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
 
+  position: relative;
+}
+
+/* 左提示 */
+.left-text {
+  font-size: 12px;
+  color: #888;
+}
+
+/* 中间按钮组 */
+.center-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Reset */
+.reset-btn {
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: bold;
+  color: white;
   background: linear-gradient(135deg, #00d5ff);
   border: none;
-  border-radius: 12px;
-
+  border-radius: 10px;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-
-  transition: all 0.2s ease;
-
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
 .reset-btn:hover {
-  transform: translateX(-50%) scale(1.05); /* ⭐必须带回居中 */
-  box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+  transform: scale(1.05);
 }
 
 .reset-btn:active {
-  transform: translateX(-50%) scale(0.95); /* ⭐同理 */
+  transform: scale(0.95);
 }
 
+/* Undo */
 .undo-btn {
-  background: none;
+  font-size: 24px;
   border: none;
-  font-size: 28px;
-  font-weight: bold;
+  background: none;
   cursor: pointer;
-
-  color: #000dff;
-
-  padding: 5px 10px;
-  border-radius: 8px;
+  color: #0077ff;
 }
 
 .undo-btn:hover {
   transform: scale(1.2);
+}
+
+/* 右菜单 */
+.menu-btn {
+  font-size: 22px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* ===== 卡片 ===== */
+.item {
+  display: inline-block;
+  margin: 10px;
+}
+
+img {
+  width: 120px;
+  cursor: pointer;
+}
+
+.ghost {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.count {
+  font-size: 18px;
+}
+
+/* ===== 统计 ===== */
+#stats {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #aaa;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.stat-item {
+  color: #999;
+  transition: color 0.2s;
+}
+
+.stat-item.active {
   color: #000;
 }
 
-/* 左文本 */
-.left-text {
-  position: absolute;
-  right: calc(50% + 80px);
-  top: 50%;
-  transform: translateY(-50%);
-  font-weight:bold;
-}
-
-.right-group {
-  position: absolute;
-  left: calc(50% + 80px); /* 紧贴Reset右边 */
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.desc {
-  font-size: 14px;
-  color: #666;
-}
-
+/* ===== 菜单 ===== */
 .menu {
-  position: absolute;
-  display: none;
-  background: #fff;
+  background: white;
   border-radius: 10px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
   padding: 8px;
   z-index: 9999;
-  width: 320px;
+  min-width: 300px;
+
+  position: absolute;
+  top: 60px;
+  right: 10px;   /* ⭐固定右上角 */
+  display: none;
 }
 
-/* 双列容器 */
 .menu-grid {
   display: flex;
 }
 
-/* 左列：属性 */
-.menu-left {
-  width: 40%;
-  border-right: 1px solid #eee;
+.menu-left,
+.menu-right {
+  width: 50%;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
-/* 右列：精灵 */
-.menu-right {
-  width: 60%;
-  padding-left: 10px;
+.menu-left {
+  border-right: 1px solid #eee;
 }
 
 .menu-item {
@@ -122,28 +158,45 @@
 .menu-item:hover {
   background: #f2f2f2;
 }
-
 </style>
 </head>
 
 <body>
 
+<!-- 顶部 -->
 <div class="top-bar">
 
-  <div class="left-text">点击图片计数</div>
-
-  <button class="reset-btn" onclick="resetAll()">Reset</button>
-  <div class="right-group">
-    <button class="undo-btn" onclick="undo()">⮪</button>
-    <span class="desc">左键+1|右键-1|长按选择数值|右键重置菜单</span>
+  <div class="left-text">
+    点击+1 | 右键-1 | 长按输入 | 右键重置
   </div>
+
+  <div class="center-group">
+    <button class="reset-btn" onclick="resetAll()">Reset</button>
+    <button class="undo-btn" onclick="undo()">⮪</button>
+  </div>
+
+  <button class="menu-btn">☰</button>
 
 </div>
 
+<!-- 内容 -->
 <div id="container"></div>
 <div id="stats"></div>
 
-<div id="typeMenu" class="menu"></div>
+<!-- 菜单 -->
+<div id="mainMenu" class="menu">
+  <div class="menu-item" onclick="switchMode('normal')">普通图鉴</div>
+  <div class="menu-item" onclick="switchMode('shiny')">✨ 异色图鉴</div>
+</div>
+
+<div id="resetMenu" class="menu">
+  <div class="menu-grid">
+    <div id="typeList" class="menu-left"></div>
+    <div id="nameList" class="menu-right"></div>
+  </div>
+</div>
+
 <script src="script.js?v=1"></script>
+
 </body>
 </html>
