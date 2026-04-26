@@ -8,9 +8,9 @@
 <style>
 
 html, body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden; /* 防止整体横屏 */
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 body {
@@ -24,17 +24,23 @@ body {
 
 /* 顶部栏 */
 .top-bar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
   height: 50px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   background: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  padding: 0 10px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-/* 按钮居中 */
+/* 提示文字 */
+.left-text {
+  font-size: 11px;
+  color: #999;
+}
+
 .center-group {
   position: absolute;
   left: 50%;
@@ -43,13 +49,6 @@ body {
   gap: 6px;
 }
 
-/* 提示文字 */
-.left-text {
-  margin-left: 10px;
-  font-size: 11px;
-  color: #666;
-  white-space: nowrap;
-}
 
 /* 按钮样式统一 */
 .reset-btn, .undo-btn {
@@ -85,15 +84,20 @@ button:active {
   transform: scale(0.95);
 }
 
-/* 网格 */
+/* ===== 核心：响应式网格 ===== */
 #container {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(4, 1fr);
   gap: 4px;
   padding: 6px;
 
-  grid-auto-flow: column; /* ⭐关键 */
+  /* 默认手机竖屏 */
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (orientation: landscape) {
+  #container {
+    grid-template-columns: repeat(6, 1fr);
+  }
 }
 
 .grid-wrapper {
@@ -102,33 +106,20 @@ button:active {
 
 /* 卡片 */
 .item {
-  background: white;
-  padding: 6px;
+  background: #fff;
   border-radius: 8px;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-
-  font-size: 10px;
-
+  aspect-ratio: 1/1;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 
-  touch-action: none;
-  
-  -webkit-tap-highlight-color: transparent;
-
-  aspect-ratio: 1 / 1;
+  font-size: 10px;
 }
 
-/* 图片 */
-.item img {
-  width: 100%;
-  object-fit: contain;
-  display: block;
 
-  max-width: 100%;
+.item img {
+  width: 80%;
   height: auto;
 }
 
@@ -171,20 +162,26 @@ button:active {
 /* 统计栏 */
 #stats {
   margin: 10px;
+  padding: 10px;
+  background: white;
+  border-radius: 10px;
   font-size: 12px;
-  color: #aaa;   /* 默认灰色 */
   text-align: center;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
 }
 
-.stat-item{
-  color:#999;
-  font-size:12px;
-  margin:2px;
+.stat-item {
+  color: #aaa;
+  transition: 0.2s;
 }
 
-.stat-item.active{
-  color:#000;
-  font-weight:normal;
+.stat-item.active {
+  color: #000;
+  font-weight: normal;
 }
 
 /* 菜单 */
