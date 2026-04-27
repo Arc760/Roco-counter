@@ -359,3 +359,80 @@ function saveHistory(){
   historyStack.push(JSON.stringify(items));
   if(historyStack.length > 50) historyStack.shift();
 }
+
+let notes = JSON.parse(localStorage.getItem("notes") || "[]");
+
+// 打开/关闭
+window.toggleNote = function () {
+  const box = document.getElementById("noteBox");
+
+  if (!box) {
+    console.error("noteBox没找到");
+    return;
+  }
+
+  box.style.display = (box.style.display === "flex") ? "none" : "flex";
+
+  renderNotes();
+};
+
+// 获取时间
+function getTime() {
+  const d = new Date();
+  return String(d.getHours()).padStart(2, "0") +
+         ":" +
+         String(d.getMinutes()).padStart(2, "0");
+}
+
+// 渲染
+function renderNotes() {
+  const list = document.getElementById("noteList");
+  if (!list) return;
+
+  list.innerHTML = "";
+
+  notes.forEach(n => {
+    const div = document.createElement("div");
+    div.innerText = n;
+    list.appendChild(div);
+  });
+}
+
+// 输入记录（核心）
+document.addEventListener("DOMContentLoaded", () => {
+
+  const input = document.getElementById("noteInput");
+
+  if (!input) {
+    console.error("noteInput没找到");
+    return;
+  }
+
+  input.addEventListener("keydown", (e) => {
+
+    if (e.key === "Enter") {
+
+      const text = input.value.trim();
+      if (!text) return;
+
+      const time = new Date();
+      const t = `${String(time.getHours()).padStart(2,"0")}:${String(time.getMinutes()).padStart(2,"0")}`;
+
+      notes.push(`[${t}] ${text}`);
+
+      localStorage.setItem("notes", JSON.stringify(notes));
+
+      input.value = "";
+      renderNotes();
+    }
+  });
+});
+
+// 清空
+window.clearNotes = function () {
+  if (!confirm("确定清空吗？")) return;
+
+  notes = [];
+  localStorage.setItem("notes", JSON.stringify(notes));
+  renderNotes();
+};
