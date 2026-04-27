@@ -184,6 +184,121 @@ img {
 .menu-item:hover {
   background: #eee;
 }
+
+#noteToggle {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+
+  width: 40px;
+  height: 40px;
+
+  background: #00d5ff;
+  color: white;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  font-size: 18px;
+  z-index: 99999;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* 面板默认隐藏 */
+#noteToggle {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+
+  width: 42px;
+  height: 42px;
+
+  background: #00d5ff;
+  color: white;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  z-index: 99999;
+}
+
+/* ⭐竖向安全浮窗（不会挡中间） */
+#noteBox {
+  position: fixed;
+  bottom: 70px;
+  left: 20px;
+
+  width: 260px;
+  height: 320px;
+
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+
+  display: none;
+  flex-direction: column;
+
+  z-index: 99999;
+  overflow: hidden;
+}
+
+/* 顶部 */
+#noteTop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px;
+  background: #00d5ff;
+  color: white;
+}
+
+#noteTop span {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* 输入框 */
+#noteInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+/* 清空按钮 */
+#clearNoteBtn {
+  border: none;
+  background: rgba(255,255,255,0.25);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* 记录区 */
+#noteList {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
+
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+
+#clearNoteBtn:hover {
+  background: rgba(255,255,255,0.35);
+}
 </style>
 </head>
 
@@ -213,6 +328,23 @@ img {
 <div id="mainMenu" class="menu">
   <div class="menu-item" onclick="switchMode('normal')">普通图鉴</div>
   <div class="menu-item" onclick="switchMode('shiny')">✨ 异色图鉴</div>
+  <div class="menu-item" onclick="toggleNote()">📝 记事本</div>
+</div>
+
+<div id="noteToggle" onclick="toggleNote()">
+  📝
+</div>
+
+<div id="noteToggle" onclick="toggleNote()">📝</div>
+
+<div id="noteBox">
+  <div id="noteTop">
+    <span>📝 </span>
+    <input id="noteInput" placeholder="输入事件，回车记录..." />
+    <button onclick="clearNotes()">🗑</button>
+  </div>
+
+  <div id="noteList"></div>
 </div>
 
 <div id="resetMenu" class="menu">
