@@ -8,6 +8,12 @@ let historyStack = [];
 let pressTimer = null;
 let lastStats = {};
 
+let autoLogs = [];  // 系统日志
+
+let noteMode = "player"; // player / system
+
+let isLongPress = false;
+
 const ALL_TYPES = [
   "火系", "水系", "冰系", "电系",
   "草系", "恶系", "机械系", "幽系",
@@ -68,7 +74,45 @@ window.addEventListener("DOMContentLoaded", init);
 function init(){
   loadData();
   bindUI();
+  bindNoteInput();
   render();
+  renderNotes();
+}
+
+function bindNoteInput(){
+
+  const input = document.getElementById("noteInput");
+
+  if (!input) {
+    console.error("❌ noteInput 没找到");
+    return;
+  }
+
+  input.onkeydown = function(e){
+
+    if (e.key === "Enter") {
+
+      e.preventDefault(); // ⭐防止换行问题
+
+      const text = input.value.trim();
+      if (!text) return;
+
+      const now = new Date();
+
+      const t = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+
+      playerNotes.push({
+        date: now.toLocaleDateString(),
+        time: t,
+        text: text
+      });
+
+      localStorage.setItem("playerNotes", JSON.stringify(playerNotes));
+
+      input.value = "";
+      renderNotes();
+    }
+  };
 }
 
 /***********************
@@ -105,12 +149,25 @@ function bindUI(){
   });
 
   document.addEventListener("click", (e)=>{
+
   mainMenu.style.display = "none";
 
   const resetMenu = document.getElementById("resetMenu");
   if (resetMenu && !resetMenu.contains(e.target)) {
     resetMenu.style.display = "none";
   }
+
+  const noteBox = document.getElementById("noteBox");
+  const toggle = document.getElementById("noteToggle");
+
+  if (
+    noteBox &&
+    !noteBox.contains(e.target) &&
+    !toggle.contains(e.target)
+  ) {
+    noteBox.style.display = "none";
+  }
+
 });
 }
 
@@ -122,7 +179,6 @@ function showResetMenu(x, y) {
 
   menu.style.display = "block";
 
-  // ⭐居中显示（你现在要求）
   menu.style.left = "50%";
   menu.style.top = "50%";
   menu.style.transform = "translate(-50%, -50%)";
@@ -205,15 +261,36 @@ function showResetMenu(x, y) {
  * 加减
 ***********************/
 window.addOne = function(i){
-  saveHistory();
+
+  if(isLongPress) {
+    isLongPress = false;
+    return; // ⭐长按结束，不执行点击
+  }
+
+  saveHistory(`撤回 ${items[i].name} +1`);
+
   items[i].count++;
+
+  addLog(`获得 ${items[i].name} +1`);
+  showToast(`✨ 获得 ${items[i].name} +1`, "good");
+
   saveData();
   render();
 };
 
 window.minusOne = function(i){
-  saveHistory();
-  if(items[i].count > 0) items[i].count--;
+  if(isLongPress) {
+    isLongPress = false;
+    return; // ⭐长按结束，不执行点击
+  }
+
+  saveHistory(`撤回 ${items[i].name} -1`);
+
+  items[i].count--;
+
+  addLog(`减少 ${items[i].name} +1`);
+  showToast(`✨ 减少 ${items[i].name} -1`, "good");
+
   saveData();
   render();
 };
@@ -223,20 +300,34 @@ window.minusOne = function(i){
 ***********************/
 window.handleMouseDown = function(i){
   pressTimer = setTimeout(()=>{
+
     let num = parseInt(prompt("输入数字"));
-    if(!isNaN(num)){
-      saveHistory();
-      items[i].count = Math.max(0, items[i].count + num);
-      saveData();
-      render();
+    if(isNaN(num)) return;
+
+    saveHistory(`撤回 ${items[i].name} ${num > 0 ? "+" : ""}${num}`);
+
+    items[i].count = Math.max(0, items[i].count + num);
+
+    // ⭐弹窗提示统一风格
+    if(num > 0){
+      showToast(`✨ ${items[i].name} +${num}`, "good");
+      addLog(`获得 ${items[i].name} +${num}`);
+    } else {
+      showToast(`⚠ ${items[i].name} ${num}`, "bad");
+      addLog(`减少 ${items[i].name} ${num}`);
     }
+
+    saveData();
+    render();
+
   }, 600);
 };
 
 window.handleMouseUp = function(){
-  clearTimeout(pressTimer);
-};
 
+  clearTimeout(pressTimer);
+
+};
 /***********************
  * render（核心修复）
 ***********************/
@@ -328,9 +419,12 @@ function updateStats(){
 window.resetAll = function(){
   if(!confirm("确定重置吗？")) return;
 
-  saveHistory();
+  saveHistory("撤回全部重置");
 
   items.forEach(i=>i.count = 0);
+
+  addLog("全部重置完成");
+  showToast("🔄 已全部重置", "warn");
 
   saveData();
   render();
@@ -350,14 +444,26 @@ window.switchMode = function(m){
 window.undo = function(){
   if(historyStack.length === 0) return;
 
-  items = JSON.parse(historyStack.pop());
+  const last = historyStack.pop();
+
+  items = JSON.parse(last.data);
+
   saveData();
   render();
+
+  // ⭐显示撤回提示
+  if (last.action) {
+    showToast(`↩ ${last.action}`, "warn");
+  }
 };
 
-function saveHistory(){
-  historyStack.push(JSON.stringify(items));
-  if(historyStack.length > 50) historyStack.shift();
+function saveHistory(actionText = "") {
+  historyStack.push({
+    data: JSON.stringify(items),
+    action: actionText
+  });
+
+  if (historyStack.length > 50) historyStack.shift();
 }
 
 let notes = JSON.parse(localStorage.getItem("notes") || "[]");
@@ -365,11 +471,7 @@ let notes = JSON.parse(localStorage.getItem("notes") || "[]");
 // 打开/关闭
 window.toggleNote = function () {
   const box = document.getElementById("noteBox");
-
-  if (!box) {
-    console.error("noteBox没找到");
-    return;
-  }
+  if (!box) return;
 
   box.style.display = (box.style.display === "flex") ? "none" : "flex";
 
@@ -384,27 +486,66 @@ function getTime() {
          String(d.getMinutes()).padStart(2, "0");
 }
 
-// 渲染
+notes = notes.map(n => {
+  if (typeof n === "string") {
+    return {
+      date: new Date().toLocaleDateString(),
+      text: n,
+      type: "log-normal"
+    };
+  }
+  return n;
+});
+
+// 渲染记事本
 function renderNotes() {
+
   const list = document.getElementById("noteList");
   if (!list) return;
 
   list.innerHTML = "";
 
-  notes.forEach(n => {
+  let data = noteMode === "player" ? playerNotes : systemLogs;
+
+  let lastDate = "";
+
+  data.forEach(n => {
+
+    // ⭐ 日期分组
+    if (n.date !== lastDate) {
+      const dateDiv = document.createElement("div");
+      dateDiv.innerText = "📅 " + n.date;
+      dateDiv.style.color = "#aaa";
+      dateDiv.style.fontSize = "12px";
+      dateDiv.style.marginTop = "6px";
+      list.appendChild(dateDiv);
+
+      lastDate = n.date;
+    }
+
     const div = document.createElement("div");
-    div.innerText = n;
+
+    div.innerText = `[${n.time}] ${n.text}`;
+
+    div.style.color = noteMode === "player" ? "#333" : "#888";
+
     list.appendChild(div);
   });
+
+  list.scrollTop = list.scrollHeight;
 }
 
+let playerNotes = JSON.parse(localStorage.getItem("playerNotes") || "[]");
+let systemLogs = JSON.parse(localStorage.getItem("systemLogs") || "[]");
+
+  localStorage.setItem("systemLogs", JSON.stringify(systemLogs));
 // 输入记录（核心）
 document.addEventListener("DOMContentLoaded", () => {
 
   const input = document.getElementById("noteInput");
 
   if (!input) {
-    console.error("noteInput没找到");
+    console.error("❌ noteInput 没找到");
     return;
   }
 
@@ -415,24 +556,87 @@ document.addEventListener("DOMContentLoaded", () => {
       const text = input.value.trim();
       if (!text) return;
 
-      const time = new Date();
-      const t = `${String(time.getHours()).padStart(2,"0")}:${String(time.getMinutes()).padStart(2,"0")}`;
+      const now = new Date();
 
-      notes.push(`[${t}] ${text}`);
+      const t = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
 
-      localStorage.setItem("notes", JSON.stringify(notes));
+      // ⭐ 存玩家记录
+      playerNotes.push({
+        date: now.toLocaleDateString(),
+        time: t,
+        text: text
+      });
+
+      localStorage.setItem("playerNotes", JSON.stringify(playerNotes));
 
       input.value = "";
       renderNotes();
     }
   });
+
 });
 
 // 清空
 window.clearNotes = function () {
-  if (!confirm("确定清空吗？")) return;
+  if (!confirm("确定清空当前记录吗？")) return;
 
-  notes = [];
-  localStorage.setItem("notes", JSON.stringify(notes));
+  if (noteMode === "player") {
+    playerNotes = [];
+    localStorage.setItem("playerNotes", JSON.stringify(playerNotes));
+  } else {
+    systemLogs = [];
+    localStorage.setItem("systemLogs", JSON.stringify(systemLogs));
+  }
+
+  renderNotes();
+};
+function showToast(text, type = "good") {
+
+  const container = document.getElementById("toastContainer");
+  if (!container) return;
+
+  const div = document.createElement("div");
+
+  div.className = `toast toast-${type}`;
+  div.innerText = text;
+
+  container.appendChild(div);
+
+  setTimeout(() => {
+    div.remove();
+  }, 3000);
+}
+
+function addLog(text) {
+
+  const now = new Date();
+
+  const t = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+
+  systemLogs.push({
+    date: now.toLocaleDateString(),
+    time: t,
+    text: text
+  });
+
+  if (systemLogs.length > 100) systemLogs.shift();
+
+  localStorage.setItem("systemLogs", JSON.stringify(systemLogs));
+
+  renderNotes();
+}
+
+window.switchNoteMode = function(mode){
+  noteMode = mode;
+
+  document.querySelectorAll(".note-header button")
+    .forEach(btn => btn.classList.remove("active"));
+
+  if(mode === "player"){
+    document.querySelectorAll(".note-header button")[0].classList.add("active");
+  } else {
+    document.querySelectorAll(".note-header button")[1].classList.add("active");
+  }
+
   renderNotes();
 };
