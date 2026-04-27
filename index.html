@@ -232,21 +232,50 @@ img {
 /* ⭐竖向安全浮窗（不会挡中间） */
 #noteBox {
   position: fixed;
-  bottom: 70px;
+  bottom: 20px;
   left: 20px;
 
   width: 260px;
   height: 320px;
 
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  background: rgba(255,255,255,0.95);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 
   display: none;
   flex-direction: column;
 
-  z-index: 99999;
-  overflow: hidden;
+  z-index: 999999; /* ⭐关键 */
+}
+
+.note-header {
+  flex-shrink: 0;
+  background: #00d5ff;
+  padding: 5px;
+  border-bottom: 1px solid #eee;
+
+  display: flex;          /* ⭐关键 */
+  align-items: center;   /* ⭐垂直居中 */
+  gap: 6px;              /* ⭐按钮间距 */
+
+  border-radius: 2px;
+}
+
+.note-header button {
+  border: none;
+  background: #ffffff;
+  color: #333;
+
+  width: 32px;
+  height: 32px;
+
+  border-radius: 10px;   /* ⭐变圆润 */
+  cursor: pointer;
+}
+
+.note-header button.active {
+  background: #0073ff;
+  color: white;
 }
 
 /* 顶部 */
@@ -270,35 +299,100 @@ img {
   flex: 1;
   border: none;
   outline: none;
-  padding: 6px;
-  border-radius: 6px;
-}
+  padding: 4px;
+  border-radius: 4px;
 
-/* 清空按钮 */
-#clearNoteBtn {
-  border: none;
-  background: rgba(255,255,255,0.25);
-  color: white;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  cursor: pointer;
+  background-color: #aaeaf7;
+  opacity: 0.5;
 }
 
 /* 记录区 */
 #noteList {
-  flex: 1;
+  flex: 2;
   padding: 8px;
   overflow-y: auto;
 
   font-size: 13px;
   line-height: 1.4;
+  
 }
 
+#clearNoteBtn {
+  margin-left: auto;
+
+  border: none;
+  background: white;  /* 红色危险按钮 */
+  color: black;
+
+  width: 28px;
+  height: 28px;
+
+  border-radius: 6px;
+  cursor: pointer;
+}
 
 #clearNoteBtn:hover {
-  background: rgba(255,255,255,0.35);
+  background:blue;
 }
+#clearNoteBtn:hover {
+  background: rgba(255,255,255,0.4);
+}
+
+/* ⭐提示容器 */
+#toastContainer {
+  position: fixed;
+  bottom: 20px;   /* ⭐从上改成下 */
+  right: 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  z-index: 999999;
+}
+
+/* ⭐单个提示 */
+.toast {
+  min-width: 160px;
+  padding: 8px 12px;
+
+  border-radius: 8px;
+  font-size: 13px;
+
+  background: rgba(183, 181, 181, 0.35); /* ⭐半透明黑 */
+  color: rgb(0, 0, 0);
+
+  backdrop-filter: blur(4px);
+
+  opacity: 0;
+  transform: translateY(20px);
+
+  animation: slideUp 0.25s forwards, fadeOut 0.3s 2.5s forwards;
+}
+
+/* 不同类型微微颜色 */
+.toast-good { border-left: 3px solid #4caf50; }
+.toast-bad  { border-left: 3px solid #ff6b6b; }
+.toast-warn { border-left: 3px solid #ffb300; }
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+}
+
+#resetMenu {
+  display: none;
+}
+
 </style>
 </head>
 
@@ -313,7 +407,7 @@ img {
 
   <div class="center-group">
     <button class="reset-btn" onclick="resetAll()">Reset</button>
-    <button class="undo-btn" onclick="undo()">⮪</button>
+    <button class="undo-btn" onclick="undo()">↩</button>
   </div>
 
   <button class="menu-btn">☰</button>
@@ -331,21 +425,23 @@ img {
   <div class="menu-item" onclick="toggleNote()">📝 记事本</div>
 </div>
 
-<div id="noteToggle" onclick="toggleNote()">
-  📝
-</div>
-
 <div id="noteToggle" onclick="toggleNote()">📝</div>
 
 <div id="noteBox">
-  <div id="noteTop">
-    <span>📝 </span>
-    <input id="noteInput" placeholder="输入事件，回车记录..." />
-    <button onclick="clearNotes()">🗑</button>
+
+  <div class="note-header">
+    <button onclick="switchNoteMode('player')">✎</button>
+    <button onclick="switchNoteMode('system')">✉</button>
+
+    <button onclick="clearNotes()" id="clearNoteBtn">♻︎</button>
   </div>
 
   <div id="noteList"></div>
+
+  <input id="noteInput" placeholder="输入记录..." />
+
 </div>
+
 
 <div id="resetMenu" class="menu">
   <div style="font-weight:bold; margin-bottom:8px;">重置菜单</div>
@@ -355,6 +451,8 @@ img {
     <div id="nameList" class="menu-right"></div>
   </div>
 </div>
+
+<div id="toastContainer"></div>
 
 <script src="script.js?v=1"></script>
 
