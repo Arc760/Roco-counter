@@ -134,15 +134,39 @@ img {
   display: none;
 }
 
+#resetMenu {
+  position: fixed;
+  display: none;
+
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  z-index: 99999;
+
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+
+  padding: 12px;
+
+  width: 700px;
+  max-width: 95vw;
+}
+
 .menu-grid {
   display: flex;
+  gap: 10px;
 }
 
 .menu-left,
 .menu-right {
-  width: 50%;
-  max-height: 300px;
-  overflow-y: auto;
+  flex: 1;
+  max-height: 70vh;
+  overflow: hidden; /* 不滚动 */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .menu-left {
@@ -153,10 +177,12 @@ img {
   padding: 6px;
   cursor: pointer;
   border-radius: 6px;
+  font-size: 14px;
+  background: #f8f8f8;
 }
 
 .menu-item:hover {
-  background: #f2f2f2;
+  background: #eee;
 }
 </style>
 </head>
@@ -190,6 +216,8 @@ img {
 </div>
 
 <div id="resetMenu" class="menu">
+  <div style="font-weight:bold; margin-bottom:8px;">重置菜单</div>
+
   <div class="menu-grid">
     <div id="typeList" class="menu-left"></div>
     <div id="nameList" class="menu-right"></div>
