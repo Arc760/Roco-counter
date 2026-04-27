@@ -272,7 +272,7 @@ window.addOne = function(i){
   items[i].count++;
 
   addLog(`获得 ${items[i].name} +1`);
-  showToast(`☑ 获得 ${items[i].name} +1`, "good");
+  showToast(`✅ 获得 ${items[i].name} +1`, "good");
 
   saveData();
   render();
@@ -289,7 +289,7 @@ window.minusOne = function(i){
   items[i].count--;
 
   addLog(`减少 ${items[i].name} -1`);
-  showToast(`Ⓧ 减少 ${items[i].name} -1`, "bad");
+  showToast(`⛔ 减少 ${items[i].name} -1`, "bad");
 
   saveData();
   render();
@@ -310,10 +310,10 @@ window.handleMouseDown = function(i){
 
     // ⭐弹窗提示统一风格
     if(num > 0){
-      showToast(`✨ ${items[i].name} +${num}`, "good");
+      showToast(`✅ ${items[i].name} +${num}`, "good");
       addLog(`获得 ${items[i].name} +${num}`);
     } else {
-      showToast(`⚠ ${items[i].name} ${num}`, "bad");
+      showToast(`⛔ ${items[i].name} ${num}`, "bad");
       addLog(`减少 ${items[i].name} ${num}`);
     }
 
@@ -424,7 +424,7 @@ window.resetAll = function(){
   items.forEach(i=>i.count = 0);
 
   addLog("全部重置完成");
-  showToast("⟲ 已全部重置", "warn");
+  showToast("🔄 已全部重置", "warn");
 
   saveData();
   render();
