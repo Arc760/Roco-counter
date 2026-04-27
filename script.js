@@ -8,6 +8,12 @@ let historyStack = [];
 let pressTimer = null;
 let lastStats = {};
 
+const ALL_TYPES = [
+  "火系", "水系", "冰系", "电系",
+  "草系", "恶系", "机械系", "幽系",
+  "虫系", "幻系", "绒绒", "犀角鸟"
+];
+
 /***********************
  * 图片路径
 ***********************/
@@ -98,11 +104,102 @@ function bindUI(){
     showResetMenu(e.pageX, e.pageY);
   });
 
-  document.addEventListener("click", ()=>{
-    mainMenu.style.display = "none";
+  document.addEventListener("click", (e)=>{
+  mainMenu.style.display = "none";
+
+  const resetMenu = document.getElementById("resetMenu");
+  if (resetMenu && !resetMenu.contains(e.target)) {
     resetMenu.style.display = "none";
+  }
+});
+}
+
+function showResetMenu(x, y) {
+
+  const menu = document.getElementById("resetMenu");
+  const typeList = document.getElementById("typeList");
+  const nameList = document.getElementById("nameList");
+
+  menu.style.display = "block";
+
+  // ⭐居中显示（你现在要求）
+  menu.style.left = "50%";
+  menu.style.top = "50%";
+  menu.style.transform = "translate(-50%, -50%)";
+
+  typeList.innerHTML = "";
+  nameList.innerHTML = "";
+
+  // ======================
+  // 统计属性
+  // ======================
+  let typeStats = {};
+
+  items.forEach(item => {
+    let types = Array.isArray(item.type) ? item.type : [item.type];
+
+    types.forEach(t => {
+      if (!typeStats[t]) typeStats[t] = 0;
+      typeStats[t] += item.count;
+    });
+  });
+
+  // ======================
+  // 左边：属性（带数值）
+  // ======================
+  Object.keys(typeStats).forEach(type => {
+
+    let div = document.createElement("div");
+    div.className = "menu-item";
+
+    div.innerText = `${type} (${typeStats[type]})`;
+
+    div.onclick = (e) => {
+      e.stopPropagation();
+
+      saveHistory();
+
+      items.forEach(item => {
+        let types = Array.isArray(item.type) ? item.type : [item.type];
+        if (types.includes(type)) {
+          item.count = 0;
+        }
+      });
+
+      saveData();
+      render();
+      menu.style.display = "none";
+    };
+
+    typeList.appendChild(div);
+  });
+
+  // ======================
+  // 右边：宠物（带数值）
+  // ======================
+  items.forEach((item, i) => {
+
+    let div = document.createElement("div");
+    div.className = "menu-item";
+
+    div.innerText = `${item.name} (${item.count})`;
+
+    div.onclick = (e) => {
+      e.stopPropagation();
+
+      saveHistory();
+
+      item.count = 0;
+
+      saveData();
+      render();
+      menu.style.display = "none";
+    };
+
+    nameList.appendChild(div);
   });
 }
+
 
 /***********************
  * 加减
